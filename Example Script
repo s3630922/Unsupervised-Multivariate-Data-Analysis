@@ -154,7 +154,7 @@ y_pred = knn.predict(X_test)
 # Cell 25 - Model Accuracy, how often is the classifier correct?
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
-# Running prediction on validation set
+# Cell 26 - Running prediction on validation set
 prediction = knn.predict(test_pca_data2[BBB:CCC])
 Result = pd.DataFrame(prediction, y[BBB:CCC])
 Result
