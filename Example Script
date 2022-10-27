@@ -155,6 +155,6 @@ y_pred = knn.predict(X_test)
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
 # Running prediction on validation set
-prediction = knn.predict(unk_pca_data2[BBB:CCC])
+prediction = knn.predict(test_pca_data2[BBB:CCC])
 Result = pd.DataFrame(prediction, y[BBB:CCC])
 Result
