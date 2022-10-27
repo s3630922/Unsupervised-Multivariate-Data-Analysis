@@ -13,3 +13,5 @@ Required libraries:
   NumPy library (version 1.20.3) was used for the generation of multi-dimensional arrays and matrices with its numerical mathematics extension,
   matplotlib library (version 3.4.3), to produce plots and graphs, and
   scikit-learn machine learning library (version 0.24.2) for Python was used first to pre-process the data prior to any multivariate analysis.
+
+Example data with samples with class (x axis) and observations (y axis). This example data is Raman spectra between 500 - 1800 cm-1.
