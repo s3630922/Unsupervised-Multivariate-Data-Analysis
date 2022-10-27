@@ -15,3 +15,5 @@ Required libraries:
   scikit-learn machine learning library (version 0.24.2) for Python was used first to pre-process the data prior to any multivariate analysis.
 
 Example data with samples with class (x axis) and observations (y axis). This example data is Raman spectra between 500 - 1800 cm-1.
+
+Please direct any questions to s3630922@student.rmit.edu.au
