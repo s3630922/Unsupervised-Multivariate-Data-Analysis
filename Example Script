@@ -53,7 +53,7 @@ ND.to_csv('z-Normalised_Binned_Data.csv', header=True) # Name of exported pre-pr
 (ND.T).plot(kind='line',legend=False, figsize=(12,4), color=colorlist)
 
 # Cell 8 - Perform and exporting PCA data
-pca = PCA(n_components=4) # Select number of Principle Component
+pca = PCA(n_components=4) # Select number of Principal Component 
 pca_data = pca.fit_transform(Normalised_Data[AAA:BBB]) # Select statistical modelling data range AAA to BBB
 per_var = np.round(pca.explained_variance_ratio_* 100, decimals=1)
 PCA_Data= pd.DataFrame(data = pca_data, columns = ['PC' + str(x) for x in range(1, len(per_var)+1)])
@@ -63,7 +63,7 @@ PCA_Data.to_csv('z-PCA_Data.csv', header=True) # Name of exported PCA data will 
 labels = ['PC' + str(x) for x in range(1, len(per_var)+1)]
 plt.bar(x=range(1,len(per_var)+1), height=per_var, tick_label=labels)
 plt.ylabel('% of Explained Variance')
-plt.xlabel('Principle Component')
+plt.xlabel('Principal Components')
 plt.title('Scree Plot')
 plt.show()
 
@@ -76,8 +76,8 @@ np.sum(explained_variance)
 
 # Cell 12 - Plot PCA
 PCA_Data.plot(x=0, y=1, kind='scatter', s=200, alpha=0.6, c=colorlist[AAA:BBB], figsize=(8,8)) # Note that PCA range must match
-plt.ylabel('Principle Component 2')
-plt.xlabel('Principle Component 1')
+plt.ylabel('Principal Component 2')
+plt.xlabel('Principal Component 1')
 plt.title('Principal Component Analysis')
 
 # Cell 13 - Loading scores for PC 1 - Current selection for top 10 contributing bands or features
@@ -111,8 +111,8 @@ print('Validation set shape:', test_pca_data2[BBB:CCC].shape) # Select validatio
 per_var2 = np.round(pca.explained_variance_ratio_* 100, decimals=1)
 PCA_Data2 = pd.DataFrame(data = test_pca_data2, columns = ['PC' + str(x) for x in range(1, len(per_var2)+1)])
 test_pca_data2[BBB:CCC].plot(x=0, y=1, kind='scatter', s=200, alpha=0.6, c=colorlist[BBB:CCC], figsize=(8,8))
-plt.ylabel('Principle Component 2')
-plt.xlabel('Principle Component 1')
+plt.ylabel('Principal Component 2')
+plt.xlabel('Principal Component 1')
 plt.title('Validation set PCA')
 
 # Cell 19 - Exporting validation set PCA data
