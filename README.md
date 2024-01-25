@@ -1,5 +1,5 @@
 # Unsupervised and supervised multivariate data analysis
-Unsupervised multivariate data analysis for FT-IR and Raman spectroscopy 
+Unsupervised and supervised multivariate data analysis for FT-IR and Raman spectroscopy 
 
 Investigations into fentanyl precursors method classification by handheld Fourier transform infrared and Raman spectroscopy and multivariate statistical analysis
 
