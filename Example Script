@@ -7,154 +7,217 @@ from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import metrics
 from sklearn.tree import DecisionTreeClassifier 
-from sklearn.model_selection import train_test_split, cross_val_score, KFold, StratifiedKFold
-from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split, cross_val_score, KFold, StratifiedKFold, LeaveOneOut
 
-# Cell 2 - Loads the csv file and display the array shape
-Raw_Data = pd.read_csv('Example data.csv', index_col=0, header=[0,1]) # Note file name for your own data
-Raw_Data.shape 
+# Cell 2 - Loads the csv file and displays the array shape
+Raw_Data = pd.read_csv('Example data.csv', index_col=0, header=[0,1]) # Note file name
+Raw_Data.shape
 
 # Cell 3 - View raw spectra
 Raw_Data.plot(kind='line',legend=False, figsize=(12,4))
 
-# Cell 4 - Add a colour scheme for identification on classes and view spectra again
+# Cell 4 - Add a colour scheme for the identification of classes and view spectra again
 colormap = {
     '1': '#ff0000',  # Red - Class 1
     '2': '#0000ff',  # Blue - Class 2
     '3': '#00ff00',  # Green - Class 3
-    '4': '#FF00FF',  # Purple - Class 4
-    '5': '#0f0f0f',  # Black - Unknown   
+    '4': '#ff00ff',  # Purple - Class 4
 }
 colorlist = [colormap[c] for c in Raw_Data.columns.get_level_values('Group')]
 Raw_Data.plot(kind='line', legend=False, figsize=(12,4), color=colorlist)
 
-# Cell 5 - Pre-processing Binning - Note only as required. If not required remove this step.
-# Separate Labels
+# Cell 5 - Separate Labels
 y = pd.DataFrame.to_numpy(Raw_Data.columns.get_level_values('Group'))
+#Note that the above function was deprecated. In later versions this can be expressed as ‘y = Raw_Data.columns.get_level_values('Group')’
+
+# Cell 6 - Pre-processing Binning - Note only as required. If not, remove this step.
+
 # Binning 
-bins = np.linspace(AAA, BBB, num=ZZZ) # Select range AAA - BBB and number of bins ZZZ
+bins = np.linspace(AAA, QQQ, num=ZZZ) # Select range AAA - QQQ and number of bins ZZZ
 groups = Raw_Data.groupby(np.digitize(Raw_Data.index,bins))
+
 # Get the mean of each bin
 Binned_Data=groups.sum()
+
 # Check new array shape
 Binned_Data.shape
 
-# Cell 6 - View binned data
+# Cell 7 - View binned data
 Binned_Data.plot(kind='line',legend=False, figsize=(12,4), color=colorlist)
 
-# Cell 7 - Pre-processing Data - Scaling - Note there are several methods available including normalising or standardising.
-# Transposed
+# Cell 8 - Pre-processing Data - Scaling - Note that there are several methods available, including normalising or standardising.
+
+# Transpose
 Transposed_Data = pd.DataFrame.to_numpy(Binned_Data.T)
-# Scaling data 
+
+# Normalise data 
 Normalised_Data = preprocessing.normalize(Transposed_Data)
-# Export and viewing preprocessed data
+
+# Export and view preprocessed data
 ND = pd.DataFrame(Normalised_Data)
 ND.to_csv('z-Normalised_Binned_Data.csv', header=True) # Name of exported pre-processed data will be z-Normalised_Data.csv
 (ND.T).plot(kind='line',legend=False, figsize=(12,4), color=colorlist)
 
-# Cell 8 - Perform and exporting PCA data
-pca = PCA(n_components=4) # Select number of Principal Component 
-pca_data = pca.fit_transform(Normalised_Data[AAA:BBB]) # Select statistical modelling data range AAA to BBB
+# Cell 9 - Perform and export PCA data
+pca = PCA(n_components=5) # Select number of Principal Component 
+pca_data = pca.fit_transform(Normalised_Data[AAA:BBB]) # Select statistical modelling data range AAA to BBB (Training Set)
 per_var = np.round(pca.explained_variance_ratio_* 100, decimals=1)
 PCA_Data= pd.DataFrame(data = pca_data, columns = ['PC' + str(x) for x in range(1, len(per_var)+1)])
 PCA_Data.to_csv('z-PCA_Data.csv', header=True) # Name of exported PCA data will be z-PCA_Data.csv
 
-# Cell 9 - Graphing the scree plot
+# Cell 10 - Graphing the scree plot
 labels = ['PC' + str(x) for x in range(1, len(per_var)+1)]
 plt.bar(x=range(1,len(per_var)+1), height=per_var, tick_label=labels)
 plt.ylabel('% of Explained Variance')
+plt.xlabel('Principal Component')
 plt.xlabel('Principal Components')
 plt.title('Scree Plot')
 plt.show()
 
-# Cell 10 - % variance explained by individual PC
-explained_variance = pca.explained_variance_ratio_
+# Cell, 11 - % variance, explained by individual PC
+explained_variance = pca.explained_variance_ratio__
 print(explained_variance)
 
-# Cell 11 - Total % explained variance by the No. of PC selected
+# Cell 12 - Total % explained variance by the No. of PC selected
 np.sum(explained_variance)
 
-# Cell 12 - Plot PCA
+# Cell 13 - Plot PCA
 PCA_Data.plot(x=0, y=1, kind='scatter', s=200, alpha=0.6, c=colorlist[AAA:BBB], figsize=(8,8)) # Note that PCA range must match
 plt.ylabel('Principal Component 2')
 plt.xlabel('Principal Component 1')
 plt.title('Principal Component Analysis')
 
-# Cell 13 - Loading scores for PC 1 - Current selection for top 10 contributing bands or features
+# Cell 14 - Loading scores for PC 1 - Current selection for top 10 contributing bands or features
 Loading_Scores = pd.Series(pca.components_[0])
 Sorted_Loading_Scores = Loading_Scores.abs().sort_values(ascending=False)
 Top_10_Bins = Sorted_Loading_Scores[0:10].index.values
 print (Loading_Scores[Top_10_Bins])
 
-# Cell 14 - Viewing and exporting loading scores for PC 1
+# Cell 15 - Viewing and exporting loading scores for PC 1
 Loading_Scores.plot(kind='line', figsize=(12,4))
 Loading_Scores.to_csv('z - Loading Scores PC 1.csv', header=True)
 
-# Cell 15 - Loading scores for PC 2 - Current selection for top 10 contributing bands or features
+# Cell 16 - Loading scores for PC 2 - Current selection for top 10 contributing bands or features
 Loading_Scores2 = pd.Series(pca.components_[1])
 Sorted_Loading_Scores2 = Loading_Scores2.abs().sort_values(ascending=False)
 Top_10_Bins2 = Sorted_Loading_Scores2[0:10].index.values
 print (Loading_Scores2[Top_10_Bins2])
 
-# Cell 16 - Viewing and exporting loading scores for PC 2
+# Cell 17 - Viewing and exporting loading scores for PC 2
 Loading_Scores2.plot(kind='line', figsize=(12,4))
 Loading_Scores2.to_csv('z - Loading Scores PC 2.csv', header=True)
 
-# Cell 17 - Function for summing an area of the spectra/bin to calculate area under the curve from point XXX to YYY
+# Cell 18 - Function for summing an area of the spectra/bin to calculate the area under the curve from point XXX to YYY
 Point_1 = ND.T[XXX:YYY].sum()
-Point_1.to_csv('w - Binned_Data.csv', header=True)
+Point_1.to_csv('w-Binned_Data.csv', header=True) # Name of exported loadings data will be w-Binned_Data.csv
 
-# Cell 18 - Perform PCA on validation set
-test_pca_data = pca.fit_transform(Normalised_Data)
-test_pca_data2= pd.DataFrame(test_pca_data)
-print('Validation set shape:', test_pca_data2[BBB:CCC].shape) # Select validation set data range BBB to CCC
-per_var2 = np.round(pca.explained_variance_ratio_* 100, decimals=1)
-PCA_Data2 = pd.DataFrame(data = test_pca_data2, columns = ['PC' + str(x) for x in range(1, len(per_var2)+1)])
-test_pca_data2[BBB:CCC].plot(x=0, y=1, kind='scatter', s=200, alpha=0.6, c=colorlist[BBB:CCC], figsize=(8,8))
-plt.ylabel('Principal Component 2')
-plt.xlabel('Principal Component 1')
-plt.title('Validation set PCA')
-
-# Cell 19 - Exporting validation set PCA data
-test_pca_data2.to_csv('z-PCA_Test_Data.csv', header=True)
-
-# Cell 20 - Establish Train and Test sets
-X_train, X_test, y_train, y_test = train_test_split(PCA_Data, y[AAA:BBB], test_size=0.2, random_state=4)
-print('Training data shape:', X_train.shape)
-print('Testing data shape:', X_test.shape)
-
-# Cell 21 - K Fold Cross Validation
+# Cell 19 - Model
 model=DecisionTreeClassifier()
+
+# Cell 20 - K Fold Cross Validation
 kfold_validation=KFold(7)
 results=cross_val_score(model, PCA_Data, y[AAA:BBB], cv=kfold_validation)
 print(results)
 print(np.mean(results))
 
-# Cell 22 - Stratified K-fold Cross Validation
+# Cell 21 - Stratified K-fold Cross Validation
 skfold=StratifiedKFold(n_splits=7)
-model=DecisionTreeClassifier()
-scores=cross_val_score(model, PCA_Data, y[AAA:BBB],cv=skfold)
-print(scores)
-print(np.mean(scores))
+results=cross_val_score(model, PCA_Data, y[AAA:BBB],cv=skfold)
+print(results)
+print(np.mean(results))
 
-# Cell 23 - Leave One Out Cross Validation (LOOCV)
-from sklearn.model_selection import LeaveOneOut
-model=DecisionTreeClassifier()
+# Cell 22 - Leave One Out Cross Validation (LOOCV)
 leave_validation=LeaveOneOut()
 results=cross_val_score(model, PCA_Data, y[AAA:BBB], cv=leave_validation)
 print(np.mean(results))
 
+#Cell 23 – Insert test data set
+
+# Perform PCA on the full dataset
+test_PCA_Data = pd.DataFrame(pca.fit_transform(Normalised_Data))
+# Assign train and test
+X_train = PCA_Data
+X_test = test_PCA_Data [BBB:CCC]
+y_train = y[AAA:BBB]
+y_test = y[BBB:CCC]
+
 #Cell 24 - Create KNN Classifier
-knn = KNeighborsClassifier(n_neighbors=3)
+knn = KNeighborsClassifier(n_neighbors=5)
+
 #Train the model using the training sets
 knn.fit(X_train, y_train)
-#Predict the response for test dataset
+
+#Predict the response for the test dataset
 y_pred = knn.predict(X_test)
 
-# Cell 25 - Model Accuracy, how often is the classifier correct?
-print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+# Cell 25 - Model Accuracy: How often is the classifier correct?
+print("Accuracy:",metrics.accuracy_score(y_pred, y_test))
 
-# Cell 26 - Running prediction on validation set
-prediction = knn.predict(test_pca_data2[BBB:CCC])
-Result = pd.DataFrame(prediction, y[BBB:CCC])
+# Cell 26 - Running prediction on test set
+Result = pd.DataFrame(y_pred, y_test)
 Result
+
+# Cell 27 – Additional libraries
+import pyChemometrics as pyChemometrics
+from pyChemometrics import ChemometricsScaler
+from pyChemometrics import ChemometricsPLS
+from sklearn.cross_decomposition import PLSRegression
+
+# Convert x and y to liked NumPy arrays
+yy = np.array(y)
+Y = yy.astype(Normalised_Data.dtype)
+X = np.array(Normalised_Data) 
+
+# Cell 28 – Perform PLS-DA
+plsda = pyChemometrics.ChemometricsPLSDA(ncomps=2, pls_algorithm=PLSRegression, xscaler=ChemometricsScaler(0))
+plsda_data = plsda.fit_transform(X, Y)
+t, u = plsda_data
+PLSDA_Data = pd.DataFrame(t)
+
+# Cell 29 - Plot PLS-DA
+PLSDA_Data.plot(x=0, y=1, kind='scatter', s=200, alpha=0.6, c=colorlist[0:77], figsize=(8,8))
+plt.ylabel('t[2]')
+plt.xlabel('t[1]')
+plt.title('PLS-DA')
+
+# Cell 30 – Display R2X(cum)
+plsda.modelParameters
+
+# Cell 31 – Calculate and plot R2Y and R2Q
+R2_scores = []
+Q2_scores = []
+for i in range(1, plsda.ncomps + 1):
+ 
+    plsdax = pyChemometrics.ChemometricsPLSDA(i, pls_algorithm=PLSRegression, xscaler=ChemometricsScaler(0))
+    plsdax.fit_transform(X, Y)
+    plsdax.cross_validation(X, Y)
+    R2_scores.append(plsdax.modelParameters["PLS"]['R2Y'])
+    Q2_scores.append(plsdax.cvParameters['PLS']['Q2Y'])
+
+features = np.arange(len(Q2_scores))
+
+plt.bar(features - 0.2, R2_scores, 0.4, label='R2')
+plt.bar(features + 0.2, Q2_scores, 0.4, label='Q2')
+plt.xticks([])
+plt.legend()
+plt.title('Model Performance')
+
+# Cell 32 – Display R2_scores
+R2_scores
+
+# Cell 33 – Display Q2_scores
+Q2_scores
+
+# Cell 34 – Calculate VIP
+vip = plsda.VIP(mode='ws', direction='y')
+VIP = pd.DataFrame(vip)
+VIPs = VIP.sort_values(0, ascending=False)
+VIPs['index'] = VIPs.index
+
+# Cell 35 - Plot VIP
+fig, ax = plt.subplots(figsize=(12,4))
+plt.bar(sorted(VIPs['index']), height=VIPs[0], tick_label=VIPs['index'])
+plt.ylabel('VIP')
+plt.xlabel('Feature')
+plt.title('VIP PLS-DA')
+plt.show()
